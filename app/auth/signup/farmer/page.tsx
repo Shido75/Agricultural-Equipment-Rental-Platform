@@ -57,33 +57,20 @@ export default function FarmerSignupPage() {
         email: formData.email,
         password: formData.password,
         options: {
-          emailRedirectTo: `${window.location.origin}/dashboard`,
+          emailRedirectTo: `${window.location.origin}/auth/callback?next=/dashboard`,
           data: {
             full_name: formData.fullName,
             phone: formData.phone,
             role: 'farmer',
+            farm_name: formData.farmName,
+            farm_size_acres: formData.farmSizeAcres ? parseFloat(formData.farmSizeAcres) : null,
+            farm_location: formData.farmLocation,
+            crop_types: formData.cropTypes,
           },
         },
       })
 
       if (authError) throw authError
-
-      // Update the profile with farmer-specific data
-      if (authData.user) {
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .update({
-            farm_name: formData.farmName,
-            farm_size_acres: formData.farmSizeAcres ? parseFloat(formData.farmSizeAcres) : null,
-            farm_location: formData.farmLocation,
-            crop_types: formData.cropTypes,
-          })
-          .eq('id', authData.user.id)
-
-        if (profileError) {
-          console.error('[v0] Profile update error:', profileError)
-        }
-      }
 
       // Redirect to success page
       router.push('/auth/signup/success?role=farmer')
@@ -119,7 +106,7 @@ export default function FarmerSignupPage() {
             {/* Basic Information */}
             <div className="space-y-4">
               <h3 className="text-lg font-semibold text-green-900">Basic Information</h3>
-              
+
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
                   <Label htmlFor="fullName">Full Name *</Label>

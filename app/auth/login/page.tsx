@@ -51,12 +51,12 @@ export default function LoginPage() {
 
       if (signInError) {
         console.error('[v0] Login error:', signInError.message)
-        
+
         // Check for specific error types
         if (signInError.message.toLowerCase().includes('invalid')) {
           setError('invalid')
-        } else if (signInError.message.toLowerCase().includes('network') || 
-                   signInError.message.toLowerCase().includes('fetch')) {
+        } else if (signInError.message.toLowerCase().includes('network') ||
+          signInError.message.toLowerCase().includes('fetch')) {
           setError('network')
         } else {
           setError('generic')

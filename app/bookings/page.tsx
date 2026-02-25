@@ -17,9 +17,17 @@ export default function BookingsPage() {
   useEffect(() => {
     const fetchBookings = async () => {
       const supabase = createClient()
+
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) {
+        setIsLoading(false)
+        return
+      }
+
       const { data, error } = await supabase
         .from('bookings')
         .select('*')
+        .eq('renter_id', user.id)
         .order('created_at', { ascending: false })
 
       if (error) {
@@ -51,13 +59,13 @@ export default function BookingsPage() {
         <div className="mb-8 flex items-center justify-between">
           <div>
             <h1 className="text-balance text-3xl font-bold text-green-900 dark:text-green-100">
-              My Bookings
+              Farmer Dashboard
             </h1>
             <p className="mt-2 text-green-700 dark:text-green-300">
               View and track all your equipment rentals
             </p>
           </div>
-          <Button onClick={() => router.push('/')} variant="outline">
+          <Button onClick={() => router.push('/equipment')} variant="outline" className="bg-green-50 text-green-700 hover:bg-green-100 hover:text-green-800 border-green-200">
             Browse Equipment
           </Button>
         </div>
@@ -71,7 +79,7 @@ export default function BookingsPage() {
               <p className="text-muted-foreground mb-6">
                 Start by browsing available equipment
               </p>
-              <Button onClick={() => router.push('/')}>
+              <Button onClick={() => router.push('/equipment')} className="bg-green-600 hover:bg-green-700">
                 Browse Equipment
               </Button>
             </CardContent>

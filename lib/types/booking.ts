@@ -3,6 +3,9 @@ export type PaymentStatus = 'pending' | 'paid'
 
 export interface Booking {
   id: string
+  equipment_id?: string
+  renter_id?: string
+  owner_id?: string
   equipment_name: string
   equipment_type: string
   rental_start_date: string
@@ -20,6 +23,8 @@ export interface Booking {
 }
 
 export interface BookingFormData {
+  equipment_id?: string
+  owner_id?: string
   equipment_name: string
   equipment_type: string
   rental_start_date: string

@@ -125,10 +125,10 @@ export default function HomePage() {
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button asChild size="lg">
-                  <Link href="/booking/checkout">Try Demo Booking</Link>
+                  <Link href="/equipment">Browse Equipment</Link>
                 </Button>
                 <Button asChild variant="outline" size="lg">
-                  <Link href="/bookings">View All Bookings</Link>
+                  <Link href="/owner/dashboard">Owner Dashboard</Link>
                 </Button>
               </div>
             </CardContent>

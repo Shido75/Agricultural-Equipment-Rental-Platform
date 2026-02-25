@@ -57,33 +57,20 @@ export default function OwnerSignupPage() {
         email: formData.email,
         password: formData.password,
         options: {
-          emailRedirectTo: `${window.location.origin}/dashboard`,
+          emailRedirectTo: `${window.location.origin}/auth/callback?next=/owner/dashboard`,
           data: {
             full_name: formData.fullName,
             phone: formData.phone,
             role: 'owner',
+            business_name: formData.businessName,
+            property_address: formData.propertyAddress,
+            equipment_count: formData.equipmentCount ? parseInt(formData.equipmentCount) : null,
+            service_area: formData.serviceArea,
           },
         },
       })
 
       if (authError) throw authError
-
-      // Update the profile with owner-specific data
-      if (authData.user) {
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .update({
-            business_name: formData.businessName,
-            property_address: formData.propertyAddress,
-            equipment_count: formData.equipmentCount ? parseInt(formData.equipmentCount) : null,
-            service_area: formData.serviceArea,
-          })
-          .eq('id', authData.user.id)
-
-        if (profileError) {
-          console.error('[v0] Profile update error:', profileError)
-        }
-      }
 
       // Redirect to success page
       router.push('/auth/signup/success?role=owner')
@@ -119,7 +106,7 @@ export default function OwnerSignupPage() {
             {/* Basic Information */}
             <div className="space-y-4">
               <h3 className="text-lg font-semibold text-amber-900">Basic Information</h3>
-              
+
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
                   <Label htmlFor="fullName">Full Name *</Label>

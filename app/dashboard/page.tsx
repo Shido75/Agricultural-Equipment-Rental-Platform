@@ -15,11 +15,28 @@ export default async function DashboardPage() {
     redirect('/auth/login')
   }
 
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', user.id)
-    .single()
+  // Sometimes the profile trigger takes a few milliseconds to run after user creation
+  // We'll retry a few times to ensure we get the profile
+  let profile = null
+  let attempts = 0
+  const maxAttempts = 5
+
+  while (!profile && attempts < maxAttempts) {
+    const { data } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', user.id)
+      .single()
+
+    if (data) {
+      profile = data
+      break
+    }
+
+    // Wait 500ms before trying again
+    await new Promise((resolve) => setTimeout(resolve, 500))
+    attempts++
+  }
 
   // Redirect based on role
   if (profile?.role === 'admin') {
