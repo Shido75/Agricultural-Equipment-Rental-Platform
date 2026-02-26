@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Tractor, Sprout, Package, CheckCircle } from 'lucide-react'
+import { Tractor, Sprout, Package, CheckCircle, MapPin, Search } from 'lucide-react'
 
 export default function HomePage() {
   return (
@@ -18,22 +18,26 @@ export default function HomePage() {
             Access modern farming equipment without the burden of ownership. Pay on delivery, rent by the day, and grow your farm efficiently.
           </p>
           <div className="mt-10 flex items-center justify-center gap-4 flex-wrap">
-            <Button asChild size="lg" className="bg-green-600 hover:bg-green-700">
-              <Link href="/auth/signup/farmer">Sign Up as Farmer</Link>
+            <Button asChild size="lg" className="bg-green-600 hover:bg-green-700 gap-2">
+              <Link href="/equipment">
+                <Search className="size-5" />
+                Browse Equipment
+              </Link>
             </Button>
             <Button asChild size="lg" className="bg-amber-600 hover:bg-amber-700">
-              <Link href="/auth/signup/owner">Sign Up as Owner</Link>
+              <Link href="/auth/signup/owner">List Your Equipment</Link>
             </Button>
             <Button asChild variant="outline" size="lg">
               <Link href="/auth/login">Login</Link>
             </Button>
           </div>
-          <div className="mt-6 flex items-center justify-center gap-4">
+          <div className="mt-4 flex items-center justify-center gap-2">
             <Button asChild variant="ghost" size="sm">
-              <Link href="/booking/checkout">View Demo Booking</Link>
+              <Link href="/auth/signup/farmer">Sign Up as Farmer</Link>
             </Button>
+            <span className="text-muted-foreground">·</span>
             <Button asChild variant="ghost" size="sm">
-              <Link href="/owner/dashboard">Demo Dashboard</Link>
+              <Link href="/auth/signup/owner">Sign Up as Owner</Link>
             </Button>
           </div>
         </div>
@@ -59,6 +63,22 @@ export default function HomePage() {
           <Card>
             <CardHeader>
               <div className="flex items-center gap-3">
+                <div className="flex size-12 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900">
+                  <MapPin className="size-6 text-blue-700 dark:text-blue-400" />
+                </div>
+                <CardTitle>Search by Location</CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <CardDescription>
+                Find equipment near your farm. Filter by city or area to see what's available close to you
+              </CardDescription>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <div className="flex items-center gap-3">
                 <div className="flex size-12 items-center justify-center rounded-lg bg-amber-100 dark:bg-amber-900">
                   <Package className="size-6 text-amber-700 dark:text-amber-400" />
                 </div>
@@ -71,22 +91,6 @@ export default function HomePage() {
               </CardDescription>
             </CardContent>
           </Card>
-
-          <Card>
-            <CardHeader>
-              <div className="flex items-center gap-3">
-                <div className="flex size-12 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900">
-                  <CheckCircle className="size-6 text-blue-700 dark:text-blue-400" />
-                </div>
-                <CardTitle>Simple Booking</CardTitle>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <CardDescription>
-                Review dates and costs, confirm your booking, and the owner will contact you for delivery
-              </CardDescription>
-            </CardContent>
-          </Card>
         </div>
 
         {/* How It Works */}
@@ -96,7 +100,7 @@ export default function HomePage() {
           </h2>
           <div className="grid gap-8 md:grid-cols-4">
             {[
-              { step: '1', title: 'Browse Equipment', desc: 'Find the right equipment for your needs' },
+              { step: '1', title: 'Browse Equipment', desc: 'Find the right equipment near you by name or location' },
               { step: '2', title: 'Select Dates', desc: 'Choose your rental period and review costs' },
               { step: '3', title: 'Confirm Booking', desc: 'Complete your booking with one click' },
               { step: '4', title: 'Pay on Delivery', desc: 'Pay the owner in cash when equipment arrives' },
@@ -118,17 +122,20 @@ export default function HomePage() {
             <CardContent className="py-12 text-center">
               <Sprout className="size-16 mx-auto mb-6 text-green-700 dark:text-green-400" />
               <h2 className="text-2xl font-bold text-green-900 dark:text-green-100 mb-4">
-                Ready to Experience the Platform?
+                Ready to Get Started?
               </h2>
               <p className="text-green-700 dark:text-green-300 mb-8 max-w-2xl mx-auto">
-                Try our demo booking flow to see how farmers can rent equipment with cash on delivery payment
+                Browse available equipment near you and book with cash on delivery — no digital payments needed.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button asChild size="lg">
-                  <Link href="/equipment">Browse Equipment</Link>
+                <Button asChild size="lg" className="bg-green-600 hover:bg-green-700 gap-2">
+                  <Link href="/equipment">
+                    <Search className="size-5" />
+                    Browse Equipment
+                  </Link>
                 </Button>
                 <Button asChild variant="outline" size="lg">
-                  <Link href="/owner/dashboard">Owner Dashboard</Link>
+                  <Link href="/auth/signup/farmer">Sign Up as Farmer</Link>
                 </Button>
               </div>
             </CardContent>
@@ -137,21 +144,8 @@ export default function HomePage() {
 
         {/* Footer */}
         <footer className="mt-20 border-t border-green-200 dark:border-green-800 pt-8 text-center text-sm text-green-600 dark:text-green-400">
-          <p className="mb-4">
-            <strong>Test Credentials:</strong> Farmer: farmer@test.com / farmer123 | Owner: owner@test.com / owner123 | Admin: admin@test.com / admin123
-          </p>
-          <p className="mb-2">
-            For setup instructions and documentation, see{' '}
-            <a href="https://github.com/your-repo" className="underline hover:text-green-700 dark:hover:text-green-300">
-              README.md
-            </a>{' '}
-            and{' '}
-            <a href="https://github.com/your-repo" className="underline hover:text-green-700 dark:hover:text-green-300">
-              SETUP.md
-            </a>
-          </p>
           <p className="text-xs text-green-500 dark:text-green-500">
-            Built with Next.js 16, React 19, Supabase, and Tailwind CSS
+            Built with Next.js, React, Supabase, and Tailwind CSS
           </p>
         </footer>
       </div>

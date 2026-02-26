@@ -19,6 +19,12 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
 
+  // Read optional redirect param (e.g. when coming from Book Now)
+  const searchParams = typeof window !== 'undefined'
+    ? new URLSearchParams(window.location.search)
+    : null
+  const redirectTo = searchParams?.get('redirect') || null
+
   const getErrorMessage = (errorType: ErrorType) => {
     switch (errorType) {
       case 'invalid':
@@ -88,7 +94,13 @@ export default function LoginPage() {
         // Continue anyway with default redirect
       }
 
-      // Redirect based on role
+      // If there's a redirect URL (e.g. came from Book Now), use it
+      if (redirectTo) {
+        router.push(redirectTo)
+        return
+      }
+
+      // Otherwise redirect based on role
       const userRole = profile?.role || 'farmer'
       console.log('[v0] Redirecting user with role:', userRole)
 
@@ -99,8 +111,6 @@ export default function LoginPage() {
       } else {
         router.push('/dashboard')
       }
-
-      router.refresh()
     } catch (err) {
       console.error('[v0] Unexpected error during login:', err)
       setError('generic')
@@ -134,22 +144,6 @@ export default function LoginPage() {
                   <p className="text-sm font-medium text-red-800 dark:text-red-300">
                     {errorMessage}
                   </p>
-                  {error === 'invalid' && (
-                    <div className="mt-2 space-y-1">
-                      <p className="text-xs text-red-600 dark:text-red-400 font-semibold">
-                        Test Credentials:
-                      </p>
-                      <p className="text-xs text-red-600 dark:text-red-400">
-                        Farmer: farmer@test.com / farmer123
-                      </p>
-                      <p className="text-xs text-red-600 dark:text-red-400">
-                        Owner: owner@test.com / owner123
-                      </p>
-                      <p className="text-xs text-red-600 dark:text-red-400">
-                        Admin: admin@test.com / admin123
-                      </p>
-                    </div>
-                  )}
                 </div>
               </div>
             )}
@@ -160,7 +154,7 @@ export default function LoginPage() {
               <Input
                 id="email"
                 type="email"
-                placeholder="farmer@test.com"
+                placeholder="you@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required

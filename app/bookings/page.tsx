@@ -20,7 +20,7 @@ export default function BookingsPage() {
 
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) {
-        setIsLoading(false)
+        router.push('/auth/login?redirect=/bookings')
         return
       }
 

@@ -24,7 +24,7 @@ export default function OwnerDashboard() {
     const { data: { user } } = await supabase.auth.getUser()
 
     if (!user) {
-      setIsLoading(false)
+      window.location.href = '/auth/login?redirect=/owner/dashboard'
       return
     }
 
