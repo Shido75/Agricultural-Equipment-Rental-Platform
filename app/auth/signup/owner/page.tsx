@@ -43,8 +43,8 @@ export default function OwnerSignupPage() {
       return
     }
 
-    if (formData.password.length < 8) {
-      setError('Password must be at least 8 characters')
+    if (formData.password.length !== 8) {
+      setError('Password must be exactly 8 characters')
       setIsLoading(false)
       return
     }
