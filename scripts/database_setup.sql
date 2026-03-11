@@ -160,32 +160,7 @@ create trigger on_auth_user_created
 
 -- ==============================================================================
 
--- 5. SEED TEST BOOKINGS DATA (Optional)
--- Insert some sample bookings for testing the dashboard
-insert into public.bookings (
-  equipment_name, equipment_type, rental_start_date, rental_end_date, 
-  total_cost, booking_status, payment_status, 
-  renter_name, renter_phone, renter_location, 
-  owner_name, owner_phone
-) values 
-(
-  'John Deere 8R 310 Tractor', 'Tractor', current_date + interval '2 days', current_date + interval '5 days', 
-  1200.00, 'confirmed', 'pending', 
-  'Green Valley Farm', '+1234567890', 'Iowa, USA', 
-  'Smith Equipment Rentals', '+1987654321'
-),
-(
-  'Case IH Axial-Flow 8250', 'Harvester', current_date - interval '5 days', current_date - interval '2 days', 
-  3500.00, 'completed', 'paid', 
-  'Green Valley Farm', '+1234567890', 'Iowa, USA', 
-  'Midwest Ag Supply', '+1122334455'
-),
-(
-  'Kubota M7-172', 'Tractor', current_date + interval '10 days', current_date + interval '14 days', 
-  800.00, 'confirmed', 'paid', 
-  'Sunrise Acres', '+1555666777', 'Illinois, USA', 
-  'Smith Equipment Rentals', '+1987654321'
-);
+
 
 -- ==============================================================================
 -- END OF SCRIPT
