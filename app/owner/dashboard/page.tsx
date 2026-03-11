@@ -10,6 +10,8 @@ import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Calendar, Package, MapPin, Phone, User, DollarSign, CheckCircle2, Tractor, Plus } from 'lucide-react'
 import Link from 'next/link'
+import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
+import { format, parseISO, startOfMonth } from 'date-fns'
 
 export default function OwnerDashboard() {
   const [bookings, setBookings] = useState<Booking[]>([])
@@ -105,6 +107,21 @@ export default function OwnerDashboard() {
   const pendingBookings = bookings.filter(b => b.payment_status === 'pending')
   const paidBookings = bookings.filter(b => b.payment_status === 'paid')
 
+  // Process earnings and bookings by month
+  const monthlyData = bookings.reduce((acc, booking) => {
+    const month = format(parseISO(booking.created_at), 'MMM yyyy')
+    if (!acc[month]) {
+      acc[month] = { name: month, earnings: 0, bookings: 0, timestamp: startOfMonth(parseISO(booking.created_at)).getTime() }
+    }
+    acc[month].bookings += 1
+    if (booking.payment_status === 'paid') {
+      acc[month].earnings += booking.total_cost
+    }
+    return acc
+  }, {} as Record<string, { name: string, earnings: number, bookings: number, timestamp: number }>)
+
+  const chartData = Object.values(monthlyData).sort((a, b) => a.timestamp - b.timestamp)
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -172,6 +189,49 @@ export default function OwnerDashboard() {
               <p className="text-xs text-muted-foreground mt-1">
                 ₹{paidBookings.reduce((sum, b) => sum + b.total_cost, 0).toLocaleString('en-IN')}
               </p>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Analytics Section */}
+        <div className="grid gap-6 mb-8 md:grid-cols-2">
+          <Card>
+            <CardHeader>
+              <CardTitle>Monthly Earnings</CardTitle>
+              <CardDescription>Total earnings from completed bookings</CardDescription>
+            </CardHeader>
+            <CardContent className="h-[300px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={chartData} margin={{ top: 10, right: 10, left: 10, bottom: 20 }}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                  <XAxis dataKey="name" tickMargin={10} />
+                  <YAxis
+                    tickFormatter={(value) => `₹${value}`}
+                    width={80}
+                    tickMargin={10}
+                  />
+                  <Tooltip formatter={(value: number) => [`₹${value.toLocaleString('en-IN')}`, 'Earnings']} />
+                  <Bar dataKey="earnings" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Bookings Per Month</CardTitle>
+              <CardDescription>Number of rental bookings over time</CardDescription>
+            </CardHeader>
+            <CardContent className="h-[300px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={chartData} margin={{ top: 10, right: 10, left: 10, bottom: 20 }}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                  <XAxis dataKey="name" tickMargin={10} />
+                  <YAxis allowDecimals={false} tickMargin={10} />
+                  <Tooltip formatter={(value: number) => [value, 'Bookings']} />
+                  <Line type="monotone" dataKey="bookings" stroke="#8b5cf6" strokeWidth={3} dot={{ r: 4 }} activeDot={{ r: 6 }} />
+                </LineChart>
+              </ResponsiveContainer>
             </CardContent>
           </Card>
         </div>
