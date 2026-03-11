@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter }
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
-import { MapPin, Search, Tractor, Filter, X, LogIn, LogOut, User, LayoutDashboard, ChevronDown } from 'lucide-react'
+import { MapPin, Search, Tractor, Filter, X, LogIn, LogOut, User, LayoutDashboard, ChevronDown, Star } from 'lucide-react'
 import Link from 'next/link'
 
 interface UserProfile {
@@ -78,7 +78,7 @@ export default function BrowseEquipmentPage() {
         const supabase = createClient()
         const { data, error } = await supabase
             .from('equipment')
-            .select('*')
+            .select('*, reviews(rating)')
             .eq('is_available', true)
             .order('created_at', { ascending: false })
 
@@ -355,6 +355,11 @@ export default function BrowseEquipmentPage() {
 function BrowseEquipmentCard({ equipment, isLoggedIn }: { equipment: Equipment; isLoggedIn: boolean }) {
     const router = useRouter()
 
+    const reviewCount = equipment.reviews?.length || 0
+    const averageRating = reviewCount > 0
+        ? equipment.reviews!.reduce((acc, curr) => acc + curr.rating, 0) / reviewCount
+        : 0
+
     const handleBookNow = () => {
         if (!isLoggedIn) {
             router.push(`/auth/login?redirect=/booking/checkout?equipment=${equipment.id}`)
@@ -380,7 +385,16 @@ function BrowseEquipmentCard({ equipment, isLoggedIn }: { equipment: Equipment; 
             )}
 
             <CardHeader className="pb-3 flex-none">
-                <CardTitle className="line-clamp-1 text-lg">{equipment.name}</CardTitle>
+                <div className="flex justify-between items-start gap-2">
+                    <CardTitle className="line-clamp-1 text-lg">{equipment.name}</CardTitle>
+                    {reviewCount > 0 && (
+                        <div className="flex items-center gap-1 bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-500 px-2 py-0.5 rounded text-xs font-medium border border-amber-200 dark:border-amber-800 flex-shrink-0">
+                            <Star className="size-3 fill-amber-500 text-amber-500" />
+                            <span>{averageRating.toFixed(1)}</span>
+                            <span className="text-muted-foreground ml-0.5">({reviewCount})</span>
+                        </div>
+                    )}
+                </div>
                 <CardDescription className="flex items-center gap-1 mt-1 text-xs">
                     <MapPin className="size-3 flex-shrink-0" />
                     <span className="truncate">{equipment.location}</span>

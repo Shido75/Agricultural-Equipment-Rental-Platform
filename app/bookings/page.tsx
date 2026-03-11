@@ -7,11 +7,19 @@ import { Booking } from '@/lib/types/booking'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Calendar, Package, MapPin, Phone, DollarSign } from 'lucide-react'
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Textarea } from '@/components/ui/textarea'
+import { Calendar, Package, MapPin, Phone, DollarSign, Star } from 'lucide-react'
 
 export default function BookingsPage() {
   const [bookings, setBookings] = useState<Booking[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false)
+  const [selectedBookingForReview, setSelectedBookingForReview] = useState<Booking | null>(null)
+  const [reviewRating, setReviewRating] = useState(0)
+  const [reviewComment, setReviewComment] = useState('')
+  const [isSubmittingReview, setIsSubmittingReview] = useState(false)
+  const [reviewedBookings, setReviewedBookings] = useState<Set<string>>(new Set())
   const router = useRouter()
 
   useEffect(() => {
@@ -34,12 +42,66 @@ export default function BookingsPage() {
         console.error('[v0] Error fetching bookings:', error)
       } else {
         setBookings(data || [])
+        // Fetch which bookings have already been reviewed
+        if (data && data.length > 0) {
+          const bookingIds = data.map(b => b.id)
+          const { data: reviewsData } = await supabase
+            .from('reviews')
+            .select('booking_id')
+            .in('booking_id', bookingIds)
+            .eq('reviewer_id', user.id)
+
+          if (reviewsData) {
+            setReviewedBookings(new Set(reviewsData.map(r => r.booking_id)))
+          }
+        }
       }
       setIsLoading(false)
     }
 
     fetchBookings()
   }, [])
+
+  const openReviewModal = (booking: Booking) => {
+    setSelectedBookingForReview(booking)
+    setReviewRating(0)
+    setReviewComment('')
+    setIsReviewModalOpen(true)
+  }
+
+  const submitReview = async () => {
+    if (!selectedBookingForReview || reviewRating === 0) return
+    setIsSubmittingReview(true)
+
+    const supabase = createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+
+    if (!user) return
+
+    const { error } = await supabase.from('reviews').insert({
+      booking_id: selectedBookingForReview.id,
+      equipment_id: selectedBookingForReview.equipment_id,
+      reviewer_id: user.id,
+      rating: reviewRating,
+      comment: reviewComment
+    })
+
+    if (error) {
+      if (error.code === '23505') {
+        alert("You have already reviewed this booking.")
+        setReviewedBookings(new Set(reviewedBookings).add(selectedBookingForReview.id))
+        setIsReviewModalOpen(false)
+      } else {
+        console.error("Error submitting review:", error)
+        alert("Failed to submit review.")
+      }
+    } else {
+      setReviewedBookings(new Set([...reviewedBookings, selectedBookingForReview.id]))
+      setIsReviewModalOpen(false)
+    }
+
+    setIsSubmittingReview(false)
+  }
 
   if (isLoading) {
     return (
@@ -170,10 +232,28 @@ export default function BookingsPage() {
                   )}
 
                   {booking.payment_status === 'paid' && (
-                    <div className="rounded-lg bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 p-3">
-                      <p className="text-xs text-green-900 dark:text-green-100">
-                        Payment completed. Thank you for your business!
-                      </p>
+                    <div className="flex flex-col gap-3 mt-2">
+                      <div className="rounded-lg bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 p-3">
+                        <p className="text-xs text-green-900 dark:text-green-100">
+                          Payment completed. Thank you for your business!
+                        </p>
+                      </div>
+
+                      {reviewedBookings.has(booking.id) ? (
+                        <div className="flex items-center gap-2 text-sm text-green-700 font-medium">
+                          <Star className="size-4 fill-green-600 text-green-600" />
+                          Review submitted
+                        </div>
+                      ) : (
+                        <Button
+                          variant="outline"
+                          onClick={() => openReviewModal(booking)}
+                          className="w-full sm:w-auto"
+                        >
+                          <Star className="size-4 mr-2" />
+                          Leave Review
+                        </Button>
+                      )}
                     </div>
                   )}
 
@@ -188,6 +268,70 @@ export default function BookingsPage() {
           </div>
         )}
       </div>
+
+      {/* Review Dialog */}
+      <Dialog open={isReviewModalOpen} onOpenChange={setIsReviewModalOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Rate the Equipment</DialogTitle>
+            <DialogDescription>
+              How was your experience with the {selectedBookingForReview?.equipment_name}?
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="flex flex-col gap-4 py-4">
+            <div className="flex justify-center gap-2">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <button
+                  key={star}
+                  type="button"
+                  onClick={() => setReviewRating(star)}
+                  className="focus:outline-none transition-transform hover:scale-110"
+                >
+                  <Star
+                    className={`size-10 ${reviewRating >= star
+                        ? 'fill-amber-400 text-amber-400'
+                        : 'fill-slate-100 text-slate-300 dark:fill-slate-800 dark:text-slate-600'
+                      }`}
+                  />
+                </button>
+              ))}
+            </div>
+
+            <div className="space-y-2 mt-4">
+              <label htmlFor="comment" className="text-sm font-medium">
+                Add an optional comment
+              </label>
+              <Textarea
+                id="comment"
+                placeholder="The equipment was in great condition..."
+                value={reviewComment}
+                onChange={(e) => setReviewComment(e.target.value)}
+                rows={3}
+              />
+            </div>
+          </div>
+
+          <DialogFooter className="sm:justify-between">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setIsReviewModalOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              onClick={submitReview}
+              disabled={reviewRating === 0 || isSubmittingReview}
+              className="bg-green-600 hover:bg-green-700"
+            >
+              {isSubmittingReview ? 'Submitting...' : 'Submit Review'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
+

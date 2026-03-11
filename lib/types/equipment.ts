@@ -10,6 +10,7 @@ export interface Equipment {
     is_available: boolean
     created_at: string
     updated_at: string
+    reviews?: { rating: number }[]
 }
 
 export interface EquipmentFormData {
