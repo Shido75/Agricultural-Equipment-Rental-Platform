@@ -10,8 +10,11 @@ import { Badge } from '@/components/ui/badge'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Textarea } from '@/components/ui/textarea'
 import { Calendar, Package, MapPin, Phone, DollarSign, Star } from 'lucide-react'
+import { useLanguage } from '@/lib/i18n/LanguageContext'
+import { LanguageSwitcher } from '@/components/LanguageSwitcher'
 
 export default function BookingsPage() {
+  const { t } = useLanguage()
   const [bookings, setBookings] = useState<Booking[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false)
@@ -88,7 +91,7 @@ export default function BookingsPage() {
 
     if (error) {
       if (error.code === '23505') {
-        alert("You have already reviewed this booking.")
+        alert(t('book.alreadyReviewed'))
         setReviewedBookings(new Set(reviewedBookings).add(selectedBookingForReview.id))
         setIsReviewModalOpen(false)
       } else {
@@ -108,7 +111,7 @@ export default function BookingsPage() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="inline-block size-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent"></div>
-          <p className="mt-4 text-muted-foreground">Loading your bookings...</p>
+          <p className="mt-4 text-muted-foreground">{t('book.loading')}</p>
         </div>
       </div>
     )
@@ -121,15 +124,18 @@ export default function BookingsPage() {
         <div className="mb-8 flex items-center justify-between">
           <div>
             <h1 className="text-balance text-3xl font-bold text-green-900 dark:text-green-100">
-              Farmer Dashboard
+              {t('book.pageTitle')}
             </h1>
             <p className="mt-2 text-green-700 dark:text-green-300">
-              View and track all your equipment rentals
+              {t('equip.pageSubtitle')}
             </p>
           </div>
-          <Button onClick={() => router.push('/equipment')} variant="outline" className="bg-green-50 text-green-700 hover:bg-green-100 hover:text-green-800 border-green-200">
-            Browse Equipment
-          </Button>
+          <div className="flex items-center gap-3">
+            <LanguageSwitcher />
+            <Button onClick={() => router.push('/equipment')} variant="outline" className="bg-green-50 text-green-700 hover:bg-green-100 hover:text-green-800 border-green-200">
+              {t('book.browseEquipment')}
+            </Button>
+          </div>
         </div>
 
         {/* Bookings List */}
@@ -137,12 +143,12 @@ export default function BookingsPage() {
           <Card>
             <CardContent className="py-16 text-center">
               <Package className="size-12 mx-auto text-muted-foreground mb-4" />
-              <h3 className="font-semibold text-lg mb-2">No bookings yet</h3>
+              <h3 className="font-semibold text-lg mb-2">{t('book.noBookingsTitle')}</h3>
               <p className="text-muted-foreground mb-6">
-                Start by browsing available equipment
+                {t('book.noBookingsDesc')}
               </p>
               <Button onClick={() => router.push('/equipment')} className="bg-green-600 hover:bg-green-700">
-                Browse Equipment
+                {t('book.browseEquipment')}
               </Button>
             </CardContent>
           </Card>
@@ -165,7 +171,7 @@ export default function BookingsPage() {
                             : 'bg-amber-100 dark:bg-amber-900 text-amber-900 dark:text-amber-100'
                         }
                       >
-                        {booking.payment_status === 'paid' ? 'Paid' : 'Pending'}
+                        {booking.payment_status === 'paid' ? t('status.completed') : t('status.pending')}
                       </Badge>
                       <Badge variant="outline" className="capitalize">
                         {booking.booking_status}
@@ -178,12 +184,12 @@ export default function BookingsPage() {
                   <div className="flex items-start gap-3">
                     <Calendar className="size-4 text-muted-foreground mt-0.5" />
                     <div className="text-sm">
-                      <p className="font-medium">Rental Period</p>
+                      <p className="font-medium">{t('book.rental')}</p>
                       <p className="text-muted-foreground">
                         {new Date(booking.rental_start_date).toLocaleDateString('en-IN', {
                           dateStyle: 'medium',
                         })}{' '}
-                        -{' '}
+                        {t('book.to')}{' '}
                         {new Date(booking.rental_end_date).toLocaleDateString('en-IN', {
                           dateStyle: 'medium',
                         })}
@@ -195,7 +201,7 @@ export default function BookingsPage() {
                   <div className="flex items-start gap-3">
                     <MapPin className="size-4 text-muted-foreground mt-0.5" />
                     <div className="text-sm">
-                      <p className="font-medium">Delivery Location</p>
+                      <p className="font-medium">{t('book.location')}</p>
                       <p className="text-muted-foreground">{booking.renter_location}</p>
                     </div>
                   </div>
@@ -204,7 +210,7 @@ export default function BookingsPage() {
                   <div className="flex items-start gap-3">
                     <Phone className="size-4 text-muted-foreground mt-0.5" />
                     <div className="text-sm">
-                      <p className="font-medium">Owner Contact</p>
+                      <p className="font-medium">{t('book.ownerContact')}</p>
                       <p className="text-muted-foreground">
                         {booking.owner_name} - {booking.owner_phone}
                       </p>
@@ -215,7 +221,7 @@ export default function BookingsPage() {
                   <div className="flex items-center justify-between border-t pt-4">
                     <div className="flex items-center gap-2">
                       <DollarSign className="size-4 text-muted-foreground" />
-                      <span className="text-sm text-muted-foreground">Total Amount</span>
+                      <span className="text-sm text-muted-foreground">{t('book.totalCost')}</span>
                     </div>
                     <span className="text-xl font-bold text-green-700 dark:text-green-400">
                       ₹{booking.total_cost.toLocaleString('en-IN')}
@@ -226,7 +232,7 @@ export default function BookingsPage() {
                   {booking.payment_status === 'pending' && (
                     <div className="rounded-lg bg-amber-50 dark:bg-amber-950 border border-amber-200 dark:border-amber-800 p-3">
                       <p className="text-xs text-amber-900 dark:text-amber-100">
-                        Please pay the owner in cash when the equipment is delivered
+                        {t('book.payOnArrival')}
                       </p>
                     </div>
                   )}
@@ -235,14 +241,14 @@ export default function BookingsPage() {
                     <div className="flex flex-col gap-3 mt-2">
                       <div className="rounded-lg bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 p-3">
                         <p className="text-xs text-green-900 dark:text-green-100">
-                          Payment completed. Thank you for your business!
+                          {t('status.completed')} ✓
                         </p>
                       </div>
 
                       {reviewedBookings.has(booking.id) ? (
                         <div className="flex items-center gap-2 text-sm text-green-700 font-medium">
                           <Star className="size-4 fill-green-600 text-green-600" />
-                          Review submitted
+                          {t('book.alreadyReviewed')}
                         </div>
                       ) : (
                         <Button
@@ -251,7 +257,7 @@ export default function BookingsPage() {
                           className="w-full sm:w-auto"
                         >
                           <Star className="size-4 mr-2" />
-                          Leave Review
+                          {t('book.leaveReview')}
                         </Button>
                       )}
                     </div>
@@ -259,7 +265,7 @@ export default function BookingsPage() {
 
                   {/* Booking Info */}
                   <div className="text-xs text-muted-foreground">
-                    Booking ID: {booking.id.slice(0, 8).toUpperCase()} •{' '}
+                    {t('book.dateBooked')}: {booking.id.slice(0, 8).toUpperCase()} •{' '}
                     {new Date(booking.created_at).toLocaleDateString('en-IN')}
                   </div>
                 </CardContent>
@@ -273,9 +279,9 @@ export default function BookingsPage() {
       <Dialog open={isReviewModalOpen} onOpenChange={setIsReviewModalOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Rate the Equipment</DialogTitle>
+            <DialogTitle>{t('book.writeReview')}</DialogTitle>
             <DialogDescription>
-              How was your experience with the {selectedBookingForReview?.equipment_name}?
+              {selectedBookingForReview?.equipment_name}
             </DialogDescription>
           </DialogHeader>
 
@@ -300,11 +306,11 @@ export default function BookingsPage() {
 
             <div className="space-y-2 mt-4">
               <label htmlFor="comment" className="text-sm font-medium">
-                Add an optional comment
+                {t('book.reviewPlaceholder')}
               </label>
               <Textarea
                 id="comment"
-                placeholder="The equipment was in great condition..."
+                placeholder={t('book.reviewPlaceholder')}
                 value={reviewComment}
                 onChange={(e) => setReviewComment(e.target.value)}
                 rows={3}
@@ -318,7 +324,7 @@ export default function BookingsPage() {
               variant="outline"
               onClick={() => setIsReviewModalOpen(false)}
             >
-              Cancel
+              {t('book.cancel')}
             </Button>
             <Button
               type="button"
@@ -326,7 +332,7 @@ export default function BookingsPage() {
               disabled={reviewRating === 0 || isSubmittingReview}
               className="bg-green-600 hover:bg-green-700"
             >
-              {isSubmittingReview ? 'Submitting...' : 'Submit Review'}
+              {isSubmittingReview ? '...' : t('book.submitReview')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -334,4 +340,3 @@ export default function BookingsPage() {
     </div>
   )
 }
-

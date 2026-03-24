@@ -1,43 +1,61 @@
+'use client'
+
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tractor, Sprout, Package, CheckCircle, MapPin, Search } from 'lucide-react'
+import { useLanguage } from '@/lib/i18n/LanguageContext'
+import { LanguageSwitcher } from '@/components/LanguageSwitcher'
 
 export default function HomePage() {
+  const { t } = useLanguage()
+
+  const steps = [
+    { step: '1', titleKey: 'home.step1Title', descKey: 'home.step1Desc' },
+    { step: '2', titleKey: 'home.step2Title', descKey: 'home.step2Desc' },
+    { step: '3', titleKey: 'home.step3Title', descKey: 'home.step3Desc' },
+    { step: '4', titleKey: 'home.step4Title', descKey: 'home.step4Desc' },
+  ] as const
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 dark:from-green-950 dark:via-emerald-950 dark:to-teal-950">
       {/* Hero Section */}
       <div className="mx-auto max-w-7xl px-4 py-16 sm:py-24">
         <div className="text-center">
+          {/* Language switcher — top right of hero */}
+          <div className="flex justify-end mb-8">
+            <LanguageSwitcher />
+          </div>
+
           <h1 className="text-balance text-4xl font-bold tracking-tight text-green-900 dark:text-green-100 sm:text-6xl">
-            Agricultural Equipment
+            {t('home.title1')}
             <br />
-            <span className="text-green-700 dark:text-green-400">Rental Platform</span>
+            <span className="text-green-700 dark:text-green-400">{t('home.title2')}</span>
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-pretty text-lg text-green-700 dark:text-green-300">
-            Access modern farming equipment without the burden of ownership. Pay on delivery, rent by the day, and grow your farm efficiently.
+            {t('home.subtitle')}
           </p>
           <div className="mt-10 flex items-center justify-center gap-4 flex-wrap">
             <Button asChild size="lg" className="bg-green-600 hover:bg-green-700 gap-2">
               <Link href="/equipment">
                 <Search className="size-5" />
-                Browse Equipment
+                {t('home.browseEquipment')}
               </Link>
             </Button>
             <Button asChild size="lg" className="bg-amber-600 hover:bg-amber-700">
-              <Link href="/auth/signup/owner">List Your Equipment</Link>
+              <Link href="/auth/signup/owner">{t('home.listYourEquipment')}</Link>
             </Button>
             <Button asChild variant="outline" size="lg">
-              <Link href="/auth/login">Login</Link>
+              <Link href="/auth/login">{t('home.login')}</Link>
             </Button>
           </div>
           <div className="mt-4 flex items-center justify-center gap-2">
             <Button asChild variant="ghost" size="sm">
-              <Link href="/auth/signup/farmer">Sign Up as Farmer</Link>
+              <Link href="/auth/signup/farmer">{t('home.signUpFarmer')}</Link>
             </Button>
             <span className="text-muted-foreground">·</span>
             <Button asChild variant="ghost" size="sm">
-              <Link href="/auth/signup/owner">Sign Up as Owner</Link>
+              <Link href="/auth/signup/owner">{t('home.signUpOwner')}</Link>
             </Button>
           </div>
         </div>
@@ -50,13 +68,11 @@ export default function HomePage() {
                 <div className="flex size-12 items-center justify-center rounded-lg bg-green-100 dark:bg-green-900">
                   <Tractor className="size-6 text-green-700 dark:text-green-400" />
                 </div>
-                <CardTitle>Modern Equipment</CardTitle>
+                <CardTitle>{t('home.featureModernTitle')}</CardTitle>
               </div>
             </CardHeader>
             <CardContent>
-              <CardDescription>
-                Access a wide range of tractors, harvesters, and specialized farming equipment from verified owners
-              </CardDescription>
+              <CardDescription>{t('home.featureModernDesc')}</CardDescription>
             </CardContent>
           </Card>
 
@@ -66,13 +82,11 @@ export default function HomePage() {
                 <div className="flex size-12 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900">
                   <MapPin className="size-6 text-blue-700 dark:text-blue-400" />
                 </div>
-                <CardTitle>Search by Location</CardTitle>
+                <CardTitle>{t('home.featureLocationTitle')}</CardTitle>
               </div>
             </CardHeader>
             <CardContent>
-              <CardDescription>
-                Find equipment near your farm. Filter by city or area to see what's available close to you
-              </CardDescription>
+              <CardDescription>{t('home.featureLocationDesc')}</CardDescription>
             </CardContent>
           </Card>
 
@@ -82,13 +96,11 @@ export default function HomePage() {
                 <div className="flex size-12 items-center justify-center rounded-lg bg-amber-100 dark:bg-amber-900">
                   <Package className="size-6 text-amber-700 dark:text-amber-400" />
                 </div>
-                <CardTitle>Pay on Arrival</CardTitle>
+                <CardTitle>{t('home.featurePayTitle')}</CardTitle>
               </div>
             </CardHeader>
             <CardContent>
-              <CardDescription>
-                No digital payment needed. Pay the owner in cash when the equipment is delivered to your farm
-              </CardDescription>
+              <CardDescription>{t('home.featurePayDesc')}</CardDescription>
             </CardContent>
           </Card>
         </div>
@@ -96,21 +108,16 @@ export default function HomePage() {
         {/* How It Works */}
         <div className="mt-20">
           <h2 className="text-center text-3xl font-bold text-green-900 dark:text-green-100 mb-12">
-            How It Works
+            {t('home.howItWorksTitle')}
           </h2>
           <div className="grid gap-8 md:grid-cols-4">
-            {[
-              { step: '1', title: 'Browse Equipment', desc: 'Find the right equipment near you by name or location' },
-              { step: '2', title: 'Select Dates', desc: 'Choose your rental period and review costs' },
-              { step: '3', title: 'Confirm Booking', desc: 'Complete your booking with one click' },
-              { step: '4', title: 'Pay on Delivery', desc: 'Pay the owner in cash when equipment arrives' },
-            ].map((item) => (
+            {steps.map((item) => (
               <div key={item.step} className="text-center">
                 <div className="mx-auto mb-4 flex size-16 items-center justify-center rounded-full bg-green-600 text-2xl font-bold text-white">
                   {item.step}
                 </div>
-                <h3 className="font-semibold text-lg mb-2 text-green-900 dark:text-green-100">{item.title}</h3>
-                <p className="text-sm text-green-700 dark:text-green-300">{item.desc}</p>
+                <h3 className="font-semibold text-lg mb-2 text-green-900 dark:text-green-100">{t(item.titleKey)}</h3>
+                <p className="text-sm text-green-700 dark:text-green-300">{t(item.descKey)}</p>
               </div>
             ))}
           </div>
@@ -122,20 +129,20 @@ export default function HomePage() {
             <CardContent className="py-12 text-center">
               <Sprout className="size-16 mx-auto mb-6 text-green-700 dark:text-green-400" />
               <h2 className="text-2xl font-bold text-green-900 dark:text-green-100 mb-4">
-                Ready to Get Started?
+                {t('home.ctaTitle')}
               </h2>
               <p className="text-green-700 dark:text-green-300 mb-8 max-w-2xl mx-auto">
-                Browse available equipment near you and book with cash on delivery — no digital payments needed.
+                {t('home.ctaDesc')}
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button asChild size="lg" className="bg-green-600 hover:bg-green-700 gap-2">
                   <Link href="/equipment">
                     <Search className="size-5" />
-                    Browse Equipment
+                    {t('home.browseEquipment')}
                   </Link>
                 </Button>
                 <Button asChild variant="outline" size="lg">
-                  <Link href="/auth/signup/farmer">Sign Up as Farmer</Link>
+                  <Link href="/auth/signup/farmer">{t('home.signUpFarmer')}</Link>
                 </Button>
               </div>
             </CardContent>

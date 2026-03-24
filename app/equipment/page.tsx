@@ -10,6 +10,8 @@ import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { MapPin, Search, Tractor, Filter, X, LogIn, LogOut, User, LayoutDashboard, ChevronDown, Star } from 'lucide-react'
 import Link from 'next/link'
+import { useLanguage } from '@/lib/i18n/LanguageContext'
+import { LanguageSwitcher } from '@/components/LanguageSwitcher'
 
 interface UserProfile {
     id: string
@@ -20,6 +22,7 @@ interface UserProfile {
 }
 
 export default function BrowseEquipmentPage() {
+    const { t } = useLanguage()
     const [equipments, setEquipments] = useState<Equipment[]>([])
     const [isLoading, setIsLoading] = useState(true)
     const [searchQuery, setSearchQuery] = useState('')
@@ -132,15 +135,16 @@ export default function BrowseEquipmentPage() {
                 <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
                         <h1 className="text-balance text-3xl font-bold text-green-900 dark:text-green-100">
-                            Browse Equipment
+                            {t('equip.pageTitle')}
                         </h1>
                         <p className="mt-2 text-green-700 dark:text-green-300">
-                            Find and rent agricultural equipment near you
+                            {t('equip.pageSubtitle')}
                         </p>
                     </div>
 
-                    {/* Right side: Profile or Login */}
+                    {/* Right side: Language + Profile or Login */}
                     <div className="flex items-center gap-3">
+                        <LanguageSwitcher />
                         {!authChecked ? (
                             // Loading skeleton
                             <div className="size-10 rounded-full bg-green-200 dark:bg-green-800 animate-pulse" />
@@ -217,7 +221,7 @@ export default function BrowseEquipmentPage() {
                                                 className="flex items-center gap-3 w-full rounded-lg px-3 py-2.5 text-sm hover:bg-red-50 dark:hover:bg-red-950 transition-colors text-red-600 dark:text-red-400 mt-1"
                                             >
                                                 <LogOut className="size-4" />
-                                                <span>Sign Out</span>
+                                                <span>{t('equip.logout')}</span>
                                             </button>
                                         </div>
                                     </div>
@@ -228,7 +232,7 @@ export default function BrowseEquipmentPage() {
                             <Button asChild size="sm" className="bg-green-600 hover:bg-green-700 gap-2">
                                 <Link href="/auth/login">
                                     <LogIn className="size-4" />
-                                    Login to Book
+                                    {t('equip.loginToBook')}
                                 </Link>
                             </Button>
                         )}
@@ -255,7 +259,7 @@ export default function BrowseEquipmentPage() {
                         <div className="relative flex-grow">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
                             <Input
-                                placeholder="Search by equipment name or description..."
+                                placeholder={t('equip.searchPlaceholder')}
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 className="pl-10 bg-white dark:bg-slate-900"
@@ -270,7 +274,7 @@ export default function BrowseEquipmentPage() {
                         <div className="relative sm:w-64">
                             <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
                             <Input
-                                placeholder="Search by location or city..."
+                                placeholder={t('equip.locationPlaceholder')}
                                 value={locationQuery}
                                 onChange={(e) => setLocationQuery(e.target.value)}
                                 className="pl-10 bg-white dark:bg-slate-900"
@@ -290,7 +294,7 @@ export default function BrowseEquipmentPage() {
                             className="cursor-pointer"
                             onClick={() => setSelectedCategory(null)}
                         >
-                            All Categories
+                            {t('equip.allCategories')}
                         </Badge>
                         {EQUIPMENT_CATEGORIES.map(cat => (
                             <Badge
@@ -311,7 +315,7 @@ export default function BrowseEquipmentPage() {
                                 {locationQuery && <span> in <strong className="text-green-700 dark:text-green-400">&quot;{locationQuery}&quot;</strong></span>}
                             </span>
                             <Button variant="ghost" size="sm" onClick={clearAllFilters} className="h-auto p-0 text-green-600 hover:text-green-700 underline">
-                                Clear filters
+                                {t('equip.clearFilters')}
                             </Button>
                         </div>
                     )}
@@ -321,21 +325,21 @@ export default function BrowseEquipmentPage() {
                 {isLoading ? (
                     <div className="py-20 text-center">
                         <div className="inline-block size-8 animate-spin rounded-full border-4 border-solid border-green-600 border-r-transparent" />
-                        <p className="mt-4 text-muted-foreground">Loading equipment...</p>
+                        <p className="mt-4 text-muted-foreground">{t('equip.loading')}</p>
                     </div>
                 ) : filteredEquipment.length === 0 ? (
                     <Card className="border-dashed border-2 bg-transparent">
                         <CardContent className="py-16 flex flex-col items-center justify-center text-center">
                             <Tractor className="size-16 text-muted-foreground mb-4 opacity-50" />
-                            <h3 className="text-xl font-medium text-green-900 dark:text-green-100 mb-2">No equipment found</h3>
+                            <h3 className="text-xl font-medium text-green-900 dark:text-green-100 mb-2">{t('equip.noResultsTitle')}</h3>
                             <p className="text-muted-foreground max-w-md">
                                 {locationQuery
                                     ? `No equipment available in "${locationQuery}". Try a different location.`
-                                    : "Try adjusting your search or category filters."}
+                                    : t('equip.noResultsDesc')}
                             </p>
                             {hasActiveFilters && (
                                 <Button variant="link" onClick={clearAllFilters} className="mt-4 text-green-600">
-                                    Clear all filters
+                                    {t('equip.clearFilters')}
                                 </Button>
                             )}
                         </CardContent>
@@ -354,6 +358,7 @@ export default function BrowseEquipmentPage() {
 
 function BrowseEquipmentCard({ equipment, isLoggedIn }: { equipment: Equipment; isLoggedIn: boolean }) {
     const router = useRouter()
+    const { t } = useLanguage()
 
     const reviewCount = equipment.reviews?.length || 0
     const averageRating = reviewCount > 0
@@ -412,7 +417,7 @@ function BrowseEquipmentCard({ equipment, isLoggedIn }: { equipment: Equipment; 
 
             <CardFooter className="flex flex-col gap-3 border-t p-4 bg-slate-50 dark:bg-slate-900/20 mt-auto flex-none">
                 <div className="flex w-full items-center justify-between">
-                    <span className="text-sm text-muted-foreground">Price per day</span>
+                    <span className="text-sm text-muted-foreground">{t('equip.perDay')}</span>
                     <span className="text-xl font-bold text-green-700 dark:text-green-400">
                         ₹{equipment.price_per_day.toLocaleString('en-IN')}
                     </span>
@@ -422,9 +427,9 @@ function BrowseEquipmentCard({ equipment, isLoggedIn }: { equipment: Equipment; 
                     className="w-full bg-green-600 hover:bg-green-700 text-white gap-2"
                 >
                     {!isLoggedIn ? (
-                        <><LogIn className="size-4" /> Login to Book</>
+                        <><LogIn className="size-4" /> {t('equip.loginToBook')}</>
                     ) : (
-                        'Book Now'
+                        t('equip.bookNow')
                     )}
                 </Button>
             </CardFooter>
